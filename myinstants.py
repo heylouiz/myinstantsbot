@@ -32,8 +32,8 @@ def search_instants(query):
     soup = BeautifulSoup(req.text, "html.parser")
     response = []
     for div_obj in soup.find_all("div", class_="instant"):
-        text = div_obj.find("a", attrs={"style": "text-decoration: underline;"}).string
-        mp3 = MP3_MATCH.search(div_obj.find("div", class_="small-button")["onclick"]).group(1)
+        text = div_obj.find("a", attrs={"style": "text-decoration: underline; font-size: 14px;"}).string
+        mp3 = MP3_MATCH.search(div_obj.find("div", class_="small-button")["onmousedown"]).group(1)
         url = BASE_URL.format(mp3)
         response.append({"text": text,
                          "url": url})
