@@ -4,11 +4,33 @@ A Telegram bot written in Python that sends voice messages from http://www.myins
 
 Check it out: www.telegram.me/myinstantsbot
 You can use it in any chat, try to use it by typing the command bellow and wait for the sounds to appear:
-```bash
+```
 @myinstantsbot rick roll
 ```
 
-Dependencies (Only works in Python3):
+## Installing dependencies and running
+
+Note: Before start you need to create a telegram bot and get a token, check the oficial documentation here:
+
+https://core.telegram.org/bots
+
+### Run with Docker (Recommended)
+
+To run this bot using Docker
+
+```
+docker build -t myinstantsbot .
+
+docker run -t --name myinstantsbot \
+              -e TELEGRAM_TOKEN='' \
+              myinstantsbot
+```
+
+Note: TELEGRAM_TOKEN='' needs to be replace with your bot token.
+
+#### Run without Docker
+
+##### Install Dependencies (Only works in Python3)
 
 Create a virtualenv (Optional):
 ```bash
@@ -26,9 +48,8 @@ Running:
 
 After all the requirements are installed you can run the bot using the command:
 ```bash
-python3 myinstantsbot.py
+TELEGRAM_TOKEN=<YOUR BOT'S TOKEN> python3 myinstantsbot.py
 ```
 
-Theres a script to keep the bot running "forever", you can run it with ./run_forever.sh
 
 If you have any doubts let me know!

@@ -6,7 +6,7 @@
     Telegram bot that search sounds in www.myinstants.com
     Author: Luiz Francisco Rodrigues da Silva <luizfrdasilva@gmail.com>
 """
-
+import os
 import datetime
 import logging
 from uuid import uuid4
@@ -15,7 +15,6 @@ import json
 from telegram import InlineQueryResultVoice, Message, Chat
 from telegram.ext import Updater, InlineQueryHandler, CommandHandler
 from telegram.ext.dispatcher import run_async
-from telegram.contrib.botan import Botan
 
 from myinstants import search_instants
 
@@ -24,14 +23,6 @@ logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s
                     level=logging.INFO)
 
 LOGGER = logging.getLogger(__name__)
-
-# Load config file
-with open('config.json') as config_file:
-    CONFIGURATION = json.load(config_file)
-
-# Create a Botan tracker object
-BOTAN = Botan(CONFIGURATION["botan_token"])
-
 
 def start(bot, update):
     """Start command handler"""
@@ -63,15 +54,7 @@ def inlinequery(bot, update):
 
 
 def track(update):
-    """Print to console and log activity with Botan.io"""
-    message = Message(uuid4(),
-                      update.inline_query.from_user,
-                      datetime.datetime.now(),
-                      Chat(uuid4(), "private"))
-
-    BOTAN.track(message,
-                update.inline_query.query)
-
+    """Log activity"""
     LOGGER.info("New message\nFrom: %s\nText: %s",
                 update.inline_query.from_user,
                 update.inline_query.query)
@@ -85,7 +68,7 @@ def error_handler(update, error):
 def main():
     """Main function"""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(CONFIGURATION["telegram_token"])
+    updater = Updater(os.environ["TELEGRAM_TOKEN"])
 
     # on different commands - answer in Telegram
     updater.dispatcher.add_handler(CommandHandler("start", start))
