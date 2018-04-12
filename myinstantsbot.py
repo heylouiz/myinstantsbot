@@ -83,6 +83,7 @@ def remove_sound_file(filename):
 """  ------------------------------------- """
 """  Upload Instant State Machine Handlers """
 """  ------------------------------------- """
+@run_async
 def upload_start(bot, update):
     """First state of the upload instant state machine"""
     update.message.reply_text("Ok, you want to upload a sound to Myinstants.\n"
@@ -129,6 +130,7 @@ def get_audio(bot, update, user_data):
 
     return NAME
 
+@run_async
 def get_name(bot, update, user_data):
     """Handler for instant name"""
     user_data['name'] = update.message.text
@@ -172,6 +174,7 @@ def name_confirmation_and_upload(bot, update, user_data):
 
     return ConversationHandler.END
 
+@run_async
 def cancel(bot, update, user_data):
     """Handler to abort the machine state"""
     update.message.reply_text("Aborting...\n See you later!")
