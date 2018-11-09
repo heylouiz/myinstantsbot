@@ -1,9 +1,9 @@
-beautifulsoup4==4.6.0
-certifi==2018.1.18
+beautifulsoup4==4.6.3
+certifi==2018.10.15
 chardet==3.0.4
-future==0.16.0
-idna==2.6
-python-telegram-bot==10.0.1
-requests==2.18.4
+future==0.17.1
+idna==2.7
+python-telegram-bot==11.1.0
+requests==2.20.1
 requests-toolbelt==0.8.0
-urllib3==1.22
+urllib3==1.24.1
