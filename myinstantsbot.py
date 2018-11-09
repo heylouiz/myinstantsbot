@@ -13,6 +13,8 @@ from uuid import uuid4
 import json
 import tempfile
 
+from contextlib import suppress
+
 from telegram import InlineQueryResultVoice, Message, Chat
 from telegram.ext import Updater, Filters, InlineQueryHandler, CommandHandler, MessageHandler, ConversationHandler
 from telegram.ext.dispatcher import run_async
@@ -74,11 +76,9 @@ def error_handler(update, error):
 
 
 def remove_sound_file(filename):
-    try:
+    with suppress(FileNotFoundError):
         os.remove(filename)
-    except os.error:
-        print("Failed to remove file {}".format(filename))
-        os.remove(filename) # Try again ¯\_(ツ)_/¯
+
 
 """  ------------------------------------- """
 """  Upload Instant State Machine Handlers """
@@ -164,6 +164,7 @@ def name_confirmation_and_upload(bot, update, user_data):
     except HTTPErrorException:
         update.message.reply_text("Error: Failed to send Instant, try again later.\nIf the problem persist talk to the developer @heylouiz")
         remove_sound_file(user_data['filename'])
+        user_data.clear()
         return ConversationHandler.END
 
     update.message.reply_text("Instant was successfully sent, you should be able to search for it in a while.\n"
@@ -171,6 +172,9 @@ def name_confirmation_and_upload(bot, update, user_data):
 
     # Remove temporary file
     remove_sound_file(user_data['filename'])
+
+    # Clear user data
+    user_data.clear()
 
     return ConversationHandler.END
 
@@ -181,6 +185,9 @@ def cancel(bot, update, user_data):
 
     if "filename" in user_data:
         remove_sound_file(user_data['filename'])
+
+    # Clear user data
+    user_data.clear()
 
     return ConversationHandler.END
 
