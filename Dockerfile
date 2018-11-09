@@ -1,7 +1,7 @@
 FROM alpine
 
 RUN apk --update --no-cache add \
-    python3
+    python3 python3-dev build-base libressl-dev libffi-dev
 
 WORKDIR /app
 
