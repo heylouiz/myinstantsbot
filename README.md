@@ -30,7 +30,9 @@ docker run -t --name myinstantsbot \
 
 Notes:
 TELEGRAM_TOKEN='' needs to be replace with your bot token.
+
 MYINSTANTS_USERNAME='' needs to be replaced with a myinstants.com username, in order to upload files
+
 MYINSTANTS_PASSWORD='' needs to be replaced with a myinstants.com password, in order to upload files
 
 #### Run without Docker
