@@ -3,6 +3,7 @@
 A Telegram bot written in Python that sends voice messages from http://www.myinstants.com.
 
 Check it out: www.telegram.me/myinstantsbot
+
 You can use it in any chat, try to use it by typing the command bellow and wait for the sounds to appear:
 ```
 @myinstantsbot rick roll
@@ -29,6 +30,7 @@ docker run -t --name myinstantsbot \
 ```
 
 Notes:
+
 TELEGRAM_TOKEN='' needs to be replace with your bot token.
 
 MYINSTANTS_USERNAME='' needs to be replaced with a myinstants.com username, in order to upload files
@@ -59,4 +61,4 @@ TELEGRAM_TOKEN=<YOUR BOT'S TOKEN> MYINSTANTS_USERNAME=<MYINSTANTS USERNAME> MYIN
 ```
 
 
-If you have any doubts let me know!
+If you have any questions let me know!
