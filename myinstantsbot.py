@@ -19,7 +19,7 @@ from telegram import InlineQueryResultVoice, Message, Chat
 from telegram.ext import Updater, Filters, InlineQueryHandler, CommandHandler, MessageHandler, ConversationHandler
 from telegram.ext.dispatcher import run_async
 
-from myinstants import search_instants, upload_instant, NameAlreadyExistsException, FileSizeException, HTTPErrorException
+from myinstants import search_instants, upload_instant, NameAlreadyExistsException, FileSizeException, HTTPErrorException, InvalidPageErrorException, LoginErrorException
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -154,20 +154,32 @@ def name_confirmation_and_upload(bot, update, user_data):
         update.message.reply_text("All right, your audio will be uploaded with the name \"{}\".".format(user_data['name']))
 
     try:
-        upload_instant(user_data['name'], user_data['filename'])
+        url = upload_instant(user_data['name'], user_data['filename'])
     except NameAlreadyExistsException:
         update.message.reply_text("Error: There is already an Instant with this name!\nSend me another name or /cancel to abort.")
         return NAME
     except FileSizeException:
         update.message.reply_text("Error: File is bigger than 300kb!\nSend me another audio or /cancel to abort.")
         return SOUND
-    except HTTPErrorException:
+    except (HTTPErrorException, InvalidPageErrorException):
         update.message.reply_text("Error: Failed to send Instant, try again later.\nIf the problem persist talk to the developer @heylouiz")
+        remove_sound_file(user_data['filename'])
+        user_data.clear()
+        return ConversationHandler.END
+    except LoginErrorException:
+        update.message.reply_text("Error: Login failed, try again later.\nIf the problem persist talk to the developer @heylouiz")
+        remove_sound_file(user_data['filename'])
+        user_data.clear()
+        return ConversationHandler.END
+    except Exception as e:
+        LOGGER.exception("Unexpected error!")
+        update.message.reply_text("Error: Unknown error!\nInform the developer @heylouiz")
         remove_sound_file(user_data['filename'])
         user_data.clear()
         return ConversationHandler.END
 
     update.message.reply_text("Instant was successfully sent, you should be able to search for it in a while.\n"
+                              f"Your sound's url: {url}\n"
                               "See you later!")
 
     # Remove temporary file
@@ -193,6 +205,12 @@ def cancel(bot, update, user_data):
 
 def main():
     """Main function"""
+
+    for var in ["MYINSTANTS_USERNAME", "MYINSTANTS_PASSWORD", "TELEGRAM_TOKEN"]:
+        if var not in os.environ:
+            LOGGER.error(f"Missing environment variable {var}! See README.md file for more information.")
+            return 1
+
     # Create the Updater and pass it your bot's token.
     updater = Updater(os.environ["TELEGRAM_TOKEN"])
 
