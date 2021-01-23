@@ -77,14 +77,19 @@ def upload_instant(name, filepath):
 
     # Create session and get cookies
     session = requests.session()
-    session.get(LOGIN_URL)
+    r = session.get(LOGIN_URL)
+
+    soup = BeautifulSoup(r.text, "html.parser")
+    token = soup.find("input", {'name': 'csrfmiddlewaretoken'}).get('value')
+
+    if not token:
+        raise InvalidPageErrorException
 
     data = {
-        "csrfmiddlewaretoken": session.cookies["csrftoken"],
-        "username": os.environ["MYINSTANTS_USERNAME"],
+        "csrfmiddlewaretoken": token,
+        "login": os.environ["MYINSTANTS_USERNAME"],
         "password": os.environ["MYINSTANTS_PASSWORD"],
-        "action": "",
-        "next": "",
+        "next": "/new/",
     }
 
     # Login
@@ -92,11 +97,6 @@ def upload_instant(name, filepath):
 
     if r.status_code != 200:
         raise LoginErrorException
-
-    r = session.get(UPLOAD_URL)
-
-    if r.status_code != 200:
-        raise HTTPErrorException
 
     # Get upload token
     soup = BeautifulSoup(r.text, "html.parser")
