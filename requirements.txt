@@ -3,7 +3,7 @@ beautifulsoup4==4.7.1
 certifi==2019.3.9
 cffi==1.12.3
 chardet==3.0.4
-cryptography==2.6.1
+cryptography==3.2
 future==0.17.1
 idna==2.8
 pycparser==2.19
