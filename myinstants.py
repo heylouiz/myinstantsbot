@@ -12,6 +12,7 @@ import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from bs4 import BeautifulSoup
 import os
+from urllib.parse import urljoin
 
 BASE_URL = "https://www.myinstants.com/{}"
 SEARCH_URL = "search/?name={}"
@@ -141,8 +142,14 @@ def upload_instant(name, filepath):
     if response.status_code != 200:
         raise HTTPErrorException
 
+    soup = BeautifulSoup(response.text, "html.parser")
+    last_uploaded_element = soup.find_all("a", class_="instant-link", text=name)
+    if not last_uploaded_element:
+        return response.url
+
     # Return sound url
-    return response.url
+    url = last_uploaded_element[-1].get("href")
+    return urljoin(response.url, url)
 
 def main():
     """Main function"""
