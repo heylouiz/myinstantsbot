@@ -204,7 +204,7 @@ def main():
     updater.dispatcher.add_handler(CommandHandler("info", info_command))
 
     # on noncommand i.e message - echo the message on Telegram
-    updater.dispatcher.add_handler(InlineQueryHandler(inlinequery))
+    updater.dispatcher.add_handler(InlineQueryHandler(inlinequery, run_async=True))
 
     # Add conversation handler
     conv_handler = ConversationHandler(
