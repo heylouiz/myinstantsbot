@@ -5,52 +5,67 @@
     Author: Luiz Francisco Rodrigues da Silva <luizfrdasilva@gmail.com>
 """
 
+import os
 import re
 import sys
+from urllib.parse import urljoin
 
 import requests
-from requests_toolbelt.multipart.encoder import MultipartEncoder
 from bs4 import BeautifulSoup
-import os
-from urllib.parse import urljoin
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 BASE_URL = "https://www.myinstants.com/{}"
 SEARCH_URL = "search/?name={}"
-UPLOAD_URL = 'https://www.myinstants.com/new/'
+UPLOAD_URL = "https://www.myinstants.com/new/"
 LOGIN_URL = "https://www.myinstants.com/accounts/login/"
 
 MP3_MATCH = re.compile(r"play\('(.*?)'\)")
 
+
 class MyInstantsApiException(Exception):
     """General exception for myinstants api"""
+
     pass
+
 
 class HTTPErrorException(MyInstantsApiException):
     """HTTP error exception for myinstants api"""
+
     pass
 
+
 class NameAlreadyExistsException(MyInstantsApiException):
-    """"Exception throw when an instants name already exists"""
+    """ "Exception throw when an instants name already exists"""
+
     pass
+
 
 class FileSizeException(MyInstantsApiException):
     """Exception throw when the instants file size is bigger than supported"""
+
     pass
+
 
 class LoginErrorException(MyInstantsApiException):
     """Exception thrown when the login failed"""
+
     pass
+
 
 class InvalidPageErrorException(MyInstantsApiException):
     """Exception thrown when an invalid page is downloaded"""
+
     pass
+
 
 def search_instants(query):
     """Search instant
-       Params:
-           query: String to search
+    Params:
+        query: String to search
     """
-    query_string = "+".join(query) if isinstance(query, list) else query.replace(" ", "+")
+    query_string = (
+        "+".join(query) if isinstance(query, list) else query.replace(" ", "+")
+    )
     url = BASE_URL.format(SEARCH_URL.format(query_string))
 
     req = requests.get(url)
@@ -62,18 +77,20 @@ def search_instants(query):
     response = []
     for div_obj in soup.find_all("div", class_="instant"):
         text = div_obj.find("a", class_="instant-link").string
-        mp3 = MP3_MATCH.search(div_obj.find("div", class_="small-button")["onmousedown"]).group(1)
+        mp3 = MP3_MATCH.search(
+            div_obj.find("div", class_="small-button")["onmousedown"]
+        ).group(1)
         url = BASE_URL.format(mp3)
-        response.append({"text": text,
-                         "url": url})
+        response.append({"text": text, "url": url})
 
     return response
 
+
 def upload_instant(name, filepath):
     """Upload sound for Myinstants
-        Params:
-            name: Name of the instants to be uploaded
-            filepath: Path of the sound file to be uploaded
+    Params:
+        name: Name of the instants to be uploaded
+        filepath: Path of the sound file to be uploaded
     """
 
     # Create session and get cookies
@@ -81,7 +98,7 @@ def upload_instant(name, filepath):
     r = session.get(LOGIN_URL)
 
     soup = BeautifulSoup(r.text, "html.parser")
-    token = soup.find("input", {'name': 'csrfmiddlewaretoken'}).get('value')
+    token = soup.find("input", {"name": "csrfmiddlewaretoken"}).get("value")
 
     if not token:
         raise InvalidPageErrorException
@@ -101,7 +118,7 @@ def upload_instant(name, filepath):
 
     # Get upload token
     soup = BeautifulSoup(r.text, "html.parser")
-    token = soup.find("input", {'name': 'csrfmiddlewaretoken'}).get('value')
+    token = soup.find("input", {"name": "csrfmiddlewaretoken"}).get("value")
 
     if not token:
         raise InvalidPageErrorException
@@ -151,6 +168,7 @@ def upload_instant(name, filepath):
     url = last_uploaded_element[-1].get("href")
     return urljoin(response.url, url)
 
+
 def main():
     """Main function"""
     try:
@@ -161,6 +179,6 @@ def main():
 
     print(response)
 
+
 if __name__ == "__main__":
     main()
-
