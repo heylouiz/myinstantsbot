@@ -224,7 +224,7 @@ def name_confirmation_and_upload(update, context):
         context.user_data.clear()
         return ConversationHandler.END
     except Exception as e:
-        LOGGER.exception("Unexpected error!")
+        LOGGER.exception(f"Unexpected error: {e}")
         update.message.reply_text(
             "Error: Unknown error!\nInform the developer @heylouiz"
         )
@@ -239,9 +239,13 @@ def name_confirmation_and_upload(update, context):
     )
 
     # Remove temporary file
-    remove_sound_file(context.user_data["filename"])
+    # Exception might prevent conversation from being ended
+    try:
+        # Remove temporary file
+        remove_sound_file(context.user_data["filename"])
+    except PermissionError as e:
+        LOGGER.exception(f"No permission to delete temp audio file: {e}")
 
-    # Clear user data
     context.user_data.clear()
 
     return ConversationHandler.END
@@ -249,12 +253,15 @@ def name_confirmation_and_upload(update, context):
 
 def cancel(update, context):
     """Handler to abort the machine state"""
-    update.message.reply_text("Aborting...\n See you later!")
+    update.message.reply_text("Upload was canceled.\nYou can try again anytime with /upload.")
 
-    if "filename" in context.user_data:
-        remove_sound_file(context.user_data["filename"])
+    # Exception might prevent conversation from being ended
+    try:
+        if "filename" in context.user_data:
+            remove_sound_file(context.user_data["filename"])
+    except PermissionError as e:
+        LOGGER.exception(f"No permission to delete temp audio file: {e}")
 
-    # Clear user data
     context.user_data.clear()
 
     return ConversationHandler.END
@@ -289,10 +296,10 @@ def main():
                 MessageHandler(Filters.voice, get_voice, run_async=True),
                 MessageHandler(Filters.audio, get_audio, run_async=True),
             ],
-            NAME: [MessageHandler(Filters.text, get_name, run_async=True)],
+            NAME: [MessageHandler(Filters.text & (~ Filters.text(["/cancel"])), get_name, run_async=True)],
             CONFIRMATION: [
                 MessageHandler(
-                    Filters.text, name_confirmation_and_upload, run_async=True
+                    Filters.text & (~ Filters.text(["/cancel"])), name_confirmation_and_upload, run_async=True
                 )
             ],
         },
