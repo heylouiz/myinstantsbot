@@ -296,10 +296,18 @@ def main():
                 MessageHandler(Filters.voice, get_voice, run_async=True),
                 MessageHandler(Filters.audio, get_audio, run_async=True),
             ],
-            NAME: [MessageHandler(Filters.text & (~ Filters.text(["/cancel"])), get_name, run_async=True)],
+            NAME: [
+                MessageHandler(
+                    Filters.text & (~Filters.command(["/cancel"])),
+                    get_name,
+                    run_async=True,
+                )
+            ],
             CONFIRMATION: [
                 MessageHandler(
-                    Filters.text & (~ Filters.text(["/cancel"])), name_confirmation_and_upload, run_async=True
+                    Filters.text & (~Filters.command(["/cancel"])),
+                    name_confirmation_and_upload,
+                    run_async=True,
                 )
             ],
         },
