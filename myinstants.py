@@ -11,6 +11,7 @@ import sys
 from urllib.parse import urljoin
 
 import requests
+import cloudscraper
 from bs4 import BeautifulSoup
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 
@@ -68,7 +69,8 @@ def search_instants(query):
     )
     url = BASE_URL.format(SEARCH_URL.format(query_string))
 
-    req = requests.get(url)
+    scraper = cloudscraper.create_scraper(browser='chrome')
+    req = scraper.get(url)
 
     if req.status_code != 200:
         return {}
