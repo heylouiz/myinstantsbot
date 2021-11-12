@@ -9,6 +9,7 @@ import os
 import re
 import sys
 from urllib.parse import urljoin
+from user_agent import generate_user_agent
 
 import requests
 from bs4 import BeautifulSoup
@@ -68,7 +69,12 @@ def search_instants(query):
     )
     url = BASE_URL.format(SEARCH_URL.format(query_string))
 
-    req = requests.get(url)
+    req = requests.get(
+        url,
+        headers={
+            "User-Agent": generate_user_agent(),
+        }
+    )
 
     if req.status_code != 200:
         return {}
