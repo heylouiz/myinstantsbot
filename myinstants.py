@@ -9,11 +9,11 @@ import os
 import re
 import sys
 from urllib.parse import urljoin
-from user_agent import generate_user_agent
 
-import requests
 import parsel
+import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
+from user_agent import generate_user_agent
 
 SEARCH_URL = "https://www.myinstants.com/search/?name={}"
 MEDIA_URL = "https://www.myinstants.com{}"
@@ -69,7 +69,7 @@ def search_instants(query):
         SEARCH_URL.format(query_string),
         headers={
             "User-Agent": generate_user_agent(),
-        }
+        },
     )
 
     if response.status_code != 200:
@@ -79,7 +79,7 @@ def search_instants(query):
     names = sel.css(".instant .instant-link::text").getall()
     links = map(
         MEDIA_URL.format,
-        sel.css(".instant .small-button::attr(onmousedown)").re("play\('(.*)'\)")
+        sel.css(".instant .small-button::attr(onmousedown)").re("play\('(.*)'\)"),
     )
     return [
         {
@@ -103,7 +103,7 @@ def upload_instant(name, filepath):
         LOGIN_URL,
         headers={
             "User-Agent": generate_user_agent(),
-        }
+        },
     )
 
     sel = parsel.Selector(response.text)
@@ -125,7 +125,7 @@ def upload_instant(name, filepath):
         data=data,
         headers={
             "User-Agent": generate_user_agent(),
-        }
+        },
     )
 
     if response.status_code != 200:
@@ -179,8 +179,7 @@ def upload_instant(name, filepath):
         raise HTTPErrorException
 
     last_uploaded_element = sel.xpath(
-        "//a[contains(@class, 'instant-link') and text()=$name]/@href",
-        name=name
+        "//a[contains(@class, 'instant-link') and text()=$name]/@href", name=name
     ).get()
     if not last_uploaded_element:
         return response.url
