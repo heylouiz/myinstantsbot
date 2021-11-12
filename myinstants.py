@@ -9,18 +9,16 @@ import os
 import re
 import sys
 from urllib.parse import urljoin
+
+import parsel
+import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 from user_agent import generate_user_agent
 
-import requests
-from bs4 import BeautifulSoup
-from requests_toolbelt.multipart.encoder import MultipartEncoder
-
-BASE_URL = "https://www.myinstants.com/{}"
-SEARCH_URL = "search/?name={}"
+SEARCH_URL = "https://www.myinstants.com/search/?name={}"
+MEDIA_URL = "https://www.myinstants.com{}"
 UPLOAD_URL = "https://www.myinstants.com/new/"
 LOGIN_URL = "https://www.myinstants.com/accounts/login/"
-
-MP3_MATCH = re.compile(r"play\('(.*?)'\)")
 
 
 class MyInstantsApiException(Exception):
@@ -67,29 +65,29 @@ def search_instants(query):
     query_string = (
         "+".join(query) if isinstance(query, list) else query.replace(" ", "+")
     )
-    url = BASE_URL.format(SEARCH_URL.format(query_string))
-
-    req = requests.get(
-        url,
+    response = requests.get(
+        SEARCH_URL.format(query_string),
         headers={
             "User-Agent": generate_user_agent(),
-        }
+        },
     )
 
-    if req.status_code != 200:
+    if response.status_code != 200:
         return {}
 
-    soup = BeautifulSoup(req.text, "html.parser")
-    response = []
-    for div_obj in soup.find_all("div", class_="instant"):
-        text = div_obj.find("a", class_="instant-link").string
-        mp3 = MP3_MATCH.search(
-            div_obj.find("div", class_="small-button")["onmousedown"]
-        ).group(1)
-        url = BASE_URL.format(mp3)
-        response.append({"text": text, "url": url})
-
-    return response
+    sel = parsel.Selector(response.text)
+    names = sel.css(".instant .instant-link::text").getall()
+    links = map(
+        MEDIA_URL.format,
+        sel.css(".instant .small-button::attr(onmousedown)").re("play\('(.*)'\)"),
+    )
+    return [
+        {
+            "text": text,
+            "url": url,
+        }
+        for text, url in zip(names, links)
+    ]
 
 
 def upload_instant(name, filepath):
@@ -101,10 +99,15 @@ def upload_instant(name, filepath):
 
     # Create session and get cookies
     session = requests.session()
-    r = session.get(LOGIN_URL)
+    response = session.get(
+        LOGIN_URL,
+        headers={
+            "User-Agent": generate_user_agent(),
+        },
+    )
 
-    soup = BeautifulSoup(r.text, "html.parser")
-    token = soup.find("input", {"name": "csrfmiddlewaretoken"}).get("value")
+    sel = parsel.Selector(response.text)
+    token = sel.css("input[name=csrfmiddlewaretoken]::attr(value)").get()
 
     if not token:
         raise InvalidPageErrorException
@@ -117,14 +120,20 @@ def upload_instant(name, filepath):
     }
 
     # Login
-    r = session.post(LOGIN_URL, data=data)
+    response = session.post(
+        LOGIN_URL,
+        data=data,
+        headers={
+            "User-Agent": generate_user_agent(),
+        },
+    )
 
-    if r.status_code != 200:
+    if response.status_code != 200:
         raise LoginErrorException
 
     # Get upload token
-    soup = BeautifulSoup(r.text, "html.parser")
-    token = soup.find("input", {"name": "csrfmiddlewaretoken"}).get("value")
+    sel = parsel.Selector(response.text)
+    token = sel.css("input[name=csrfmiddlewaretoken]::attr(value)").get()
 
     if not token:
         raise InvalidPageErrorException
@@ -153,26 +162,30 @@ def upload_instant(name, filepath):
     response = session.post(
         UPLOAD_URL,
         data=multipart_data,
-        headers={"Content-Type": multipart_data.content_type, "Referer": UPLOAD_URL},
+        headers={
+            "Content-Type": multipart_data.content_type,
+            "Referer": UPLOAD_URL,
+            "User-Agent": generate_user_agent(),
+        },
     )
 
-    soup = BeautifulSoup(response.text, "html.parser")
-    for ul_obj in soup.find_all("ul", class_="errorlist"):
-        if ul_obj.text.lower().find("instant with this name already exists.") >= 0:
-            raise NameAlreadyExistsException
-        if ul_obj.text.lower().find("please keep filesize under 300.0 kb") >= 0:
-            raise FileSizeException
+    sel = parsel.Selector(response.text)
+    errors = "\n".join(sel.css("ul.errorlist").getall())
+    if "instant with this name already exists." in errors:
+        raise NameAlreadyExistsException
+    if "please keep filesize under 300.0 kb" in errors:
+        raise FileSizeException
     if response.status_code != 200:
         raise HTTPErrorException
 
-    soup = BeautifulSoup(response.text, "html.parser")
-    last_uploaded_element = soup.find_all("a", class_="instant-link", text=name)
+    last_uploaded_element = sel.xpath(
+        "//a[contains(@class, 'instant-link') and text()=$name]/@href", name=name
+    ).get()
     if not last_uploaded_element:
         return response.url
 
     # Return sound url
-    url = last_uploaded_element[-1].get("href")
-    return urljoin(response.url, url)
+    return urljoin(response.url, last_uploaded_element)
 
 
 def main():

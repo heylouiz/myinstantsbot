@@ -1,6 +1,6 @@
-beautifulsoup4
 python-telegram-bot==13.7
 requests
 requests-toolbelt
 urllib3
 user-agent
+parsel
