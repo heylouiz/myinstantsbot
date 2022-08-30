@@ -15,9 +15,9 @@ import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
 from user_agent import generate_user_agent
 
-SEARCH_URL = "https://www.myinstants.com/search/?name={}"
+SEARCH_URL = "https://www.myinstants.com/en/search/?name={}"
 MEDIA_URL = "https://www.myinstants.com{}"
-UPLOAD_URL = "https://www.myinstants.com/new/"
+UPLOAD_URL = "https://www.myinstants.com/en/new/"
 LOGIN_URL = "https://www.myinstants.com/accounts/login/"
 
 
