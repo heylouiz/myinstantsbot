@@ -15,6 +15,10 @@ Note: Before start you need to create a telegram bot and get a token, check the 
 
 https://core.telegram.org/bots
 
+Since this bot uses inline queries to search for sounds, you also need to enable it on your bot, check the oficial documentation here:
+
+https://core.telegram.org/bots/inline
+
 ### Run with Docker (Recommended)
 
 To run this bot using Docker
