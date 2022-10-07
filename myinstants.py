@@ -116,7 +116,7 @@ def upload_instant(name, filepath):
         "csrfmiddlewaretoken": token,
         "login": os.environ["MYINSTANTS_USERNAME"],
         "password": os.environ["MYINSTANTS_PASSWORD"],
-        "next": "/new/",
+        "next": "/en/new/",
     }
 
     # Login
