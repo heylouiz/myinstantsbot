@@ -6,15 +6,13 @@
     Telegram bot that search sounds in www.myinstants.com
     Author: Luiz Francisco Rodrigues da Silva <luizfrdasilva@gmail.com>
 """
-import datetime
-import json
 import logging
 import os
 import tempfile
 from contextlib import suppress
 from uuid import uuid4
 
-from telegram import Chat, InlineQueryResultVoice, Message
+from telegram import InlineQueryResultVoice
 from telegram.ext import (
     CommandHandler,
     ConversationHandler,
@@ -263,7 +261,9 @@ def name_confirmation_and_upload(update, context):
 
 def cancel(update, context):
     """Handler to abort the machine state"""
-    update.message.reply_text("Upload was canceled.\nYou can try again anytime with /upload.")
+    update.message.reply_text(
+        "Upload was canceled.\nYou can try again anytime with /upload."
+    )
 
     # Exception might prevent conversation from being ended
     try:

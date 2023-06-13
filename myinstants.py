@@ -79,7 +79,9 @@ def search_instants(query):
     names = sel.css(".instant .instant-link::text").getall()
     links = map(
         MEDIA_URL.format,
-        sel.css(".instant .small-button::attr(onclick),.instant .small-button::attr(onmousedown)").re(r"play\('(.*?)',"),
+        sel.css(
+            ".instant .small-button::attr(onclick),.instant .small-button::attr(onmousedown)"
+        ).re(r"play\('(.*?)',"),
     )
     return [
         {
