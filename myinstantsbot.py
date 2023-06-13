@@ -104,13 +104,23 @@ def remove_sound_file(filename):
 
 def upload_start(update, context):
     """First state of the upload instant state machine"""
+    # Myinstants added a cloudflare protection in the upload page
+    # I don't want to deal with this right now so the upload feature is disabled
+    # Old upload code is commented bellow:
+    # update.message.reply_text(
+    #     "Ok, you want to upload a sound to Myinstants.\n"
+    #     "First, send me the sound you want to upload, it can be a voice message or an audio file, "
+    #     "as long it is smaller than 300kb.\n\n"
+    #     "Use the command /cancel to abort the upload."
+    # )
+    # return SOUND
     update.message.reply_text(
-        "Ok, you want to upload a sound to Myinstants.\n"
-        "First, send me the sound you want to upload, it can be a voice message or an audio file, "
-        "as long it is smaller than 300kb.\n\n"
-        "Use the command /cancel to abort the upload."
+        "Unfortunately Myinstants website added some restrictions and this unofficial bot can't"
+        " upload sounds anymore, please upload directly through the website and the"
+        " bot will be able to search and send your sound afterward.\n\n"
+        "Upload link: https://www.myinstants.com/pt/new/"
     )
-    return SOUND
+    return ConversationHandler.END
 
 
 def get_voice(update, context):
