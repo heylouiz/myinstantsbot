@@ -1,0 +1,11 @@
+services:
+  myinstantsbot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+     - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+     - MYINSTANTS_USERNAME=${MYINSTANTS_USERNAME}
+     - MYINSTANTS_PASSWORD=${MYINSTANTS_PASSWORD}
+    volumes:
+     - .:/app
