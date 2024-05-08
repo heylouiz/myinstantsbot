@@ -23,37 +23,31 @@ LOGIN_URL = "https://www.myinstants.com/accounts/login/"
 
 class MyInstantsApiException(Exception):
     """General exception for myinstants api"""
-
     pass
 
 
 class HTTPErrorException(MyInstantsApiException):
     """HTTP error exception for myinstants api"""
-
     pass
 
 
 class NameAlreadyExistsException(MyInstantsApiException):
     """ "Exception throw when an instants name already exists"""
-
     pass
 
 
 class FileSizeException(MyInstantsApiException):
     """Exception throw when the instants file size is bigger than supported"""
-
     pass
 
 
 class LoginErrorException(MyInstantsApiException):
     """Exception thrown when the login failed"""
-
     pass
 
 
 class InvalidPageErrorException(MyInstantsApiException):
     """Exception thrown when an invalid page is downloaded"""
-
     pass
 
 
@@ -77,16 +71,14 @@ def search_instants(query):
 
     sel = parsel.Selector(response.text)
     names = sel.css(".instant .instant-link::text").getall()
-    links = map(
-        MEDIA_URL.format,
-        sel.css(
-            ".instant .small-button::attr(onclick),.instant .small-button::attr(onmousedown)"
-        ).re(r"play\('(.*?)',"),
-    )
+    links = sel.css(
+        ".instant .small-button::attr(onclick),.instant .small-button::attr(onmousedown)"
+    ).re(r"play\('(.*?)',")
+
     return [
         {
             "text": text,
-            "url": url,
+            "url": MEDIA_URL.format(url),
         }
         for text, url in zip(names, links)
     ]
