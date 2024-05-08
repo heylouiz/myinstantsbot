@@ -28,18 +28,12 @@ docker build -t myinstantsbot .
 
 docker run -t --name myinstantsbot \
               -e TELEGRAM_TOKEN='' \
-              -e MYINSTANTS_USERNAME='' \
-              -e MYINSTANTS_PASSWORD='' \
               myinstantsbot
 ```
 
 Notes:
 
 TELEGRAM_TOKEN='' needs to be replace with your bot token.
-
-MYINSTANTS_USERNAME='' needs to be replaced with a myinstants.com username, in order to upload files
-
-MYINSTANTS_PASSWORD='' needs to be replaced with a myinstants.com password, in order to upload files
 
 #### Run without Docker
 
@@ -61,7 +55,7 @@ Running:
 
 After all the requirements are installed you can run the bot using the command:
 ```bash
-TELEGRAM_TOKEN=<YOUR BOT'S TOKEN> MYINSTANTS_USERNAME=<MYINSTANTS USERNAME> MYINSTANTS_PASSWORD=<MYINSTANTS PASSWORD> python3 myinstantsbot.py
+TELEGRAM_TOKEN=<YOUR BOT'S TOKEN> python3 myinstantsbot.py
 ```
 
 
