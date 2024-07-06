@@ -1,5 +1,5 @@
 anyio==4.3.0
-certifi==2024.2.2
+certifi==2024.7.4
 charset-normalizer==3.3.2
 cssselect==1.2.0
 h11==0.14.0
