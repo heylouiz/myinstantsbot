@@ -72,7 +72,7 @@ async def inline_query(update: Update, _: ContextTypes.DEFAULT_TYPE):
     await update.inline_query.answer(inline_results[:40])
 
 
-def error_handler(update, context):
+async def error_handler(update, context):
     """Error Handler"""
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
