@@ -69,7 +69,7 @@ async def inline_query(update: Update, _: ContextTypes.DEFAULT_TYPE):
             )
         )
 
-    await update.inline_query.answer(inline_results[:40])
+    await update.inline_query.answer(inline_results[:10], cache_time=300)
 
 
 async def error_handler(update, context):
@@ -86,7 +86,7 @@ def main():
         return 1
 
     # Create the Application and pass it your bot's token.
-    application = Application.builder().token(os.environ.get("TELEGRAM_TOKEN")).build()
+    application = Application.builder().token(os.environ.get("TELEGRAM_TOKEN")).concurrent_updates(True).build()
 
     # on different commands - answer in Telegram
     application.add_handler(CommandHandler("start", start))
@@ -99,7 +99,7 @@ def main():
     application.add_handler(InlineQueryHandler(inline_query))
 
     # Run the bot until the user presses Ctrl-C
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
 
 
 if __name__ == "__main__":
