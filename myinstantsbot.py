@@ -93,6 +93,8 @@ def main():
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("info", info_command))
 
+    application.add_error_handler(error_handler)
+
     # on inline queries - show corresponding inline results
     application.add_handler(InlineQueryHandler(inline_query))
 
