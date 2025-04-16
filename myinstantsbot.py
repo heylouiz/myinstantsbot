@@ -60,7 +60,7 @@ async def inline_query(update: Update, _: ContextTypes.DEFAULT_TYPE):
         return
 
     inline_results = list()
-    results = search_instants(query)
+    results = await search_instants(query)
 
     for instant in results:
         inline_results.append(

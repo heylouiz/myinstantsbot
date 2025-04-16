@@ -5,8 +5,9 @@
     Author: Luiz Francisco Rodrigues da Silva <luizfrdasilva@gmail.com>
 """
 
+import aiohttp
+import asyncio
 import os
-import re
 import sys
 from urllib.parse import urljoin
 
@@ -51,7 +52,7 @@ class InvalidPageErrorException(MyInstantsApiException):
     pass
 
 
-def search_instants(query):
+async def search_instants(query):
     """Search instant
     Params:
         query: String to search
@@ -59,17 +60,20 @@ def search_instants(query):
     query_string = (
         "+".join(query) if isinstance(query, list) else query.replace(" ", "+")
     )
-    response = requests.get(
-        SEARCH_URL.format(query_string),
-        headers={
-            "User-Agent": generate_user_agent(),
-        },
-    )
 
-    if response.status_code != 200:
-        return {}
+    url = SEARCH_URL.format(query_string)
+    headers = {
+        "User-Agent": generate_user_agent()
+    }
+    data = None
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers) as response:
+            if response.status == 200:
+                data = await response.text()
+            else:
+                return []
 
-    sel = parsel.Selector(response.text)
+    sel = parsel.Selector(data)
     names = sel.css(".instant .instant-link::text").getall()
     links = sel.css(
         ".instant .small-button::attr(onclick),.instant .small-button::attr(onmousedown)"
