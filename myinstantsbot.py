@@ -89,14 +89,14 @@ def main():
     application = Application.builder().token(os.environ.get("TELEGRAM_TOKEN")).concurrent_updates(True).build()
 
     # on different commands - answer in Telegram
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("info", info_command))
+    application.add_handler(CommandHandler("start", start, block=False))
+    application.add_handler(CommandHandler("help", help_command, block=False))
+    application.add_handler(CommandHandler("info", info_command, block=False))
 
-    application.add_error_handler(error_handler)
+    application.add_error_handler(error_handler, block=False)
 
     # on inline queries - show corresponding inline results
-    application.add_handler(InlineQueryHandler(inline_query))
+    application.add_handler(InlineQueryHandler(inline_query, block=False))
 
     # Run the bot until the user presses Ctrl-C
     application.run_polling(allowed_updates=Update.ALL_TYPES, drop_pending_updates=True)
