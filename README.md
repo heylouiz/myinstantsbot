@@ -28,12 +28,18 @@ docker build -t myinstantsbot .
 
 docker run -t --name myinstantsbot \
               -e TELEGRAM_TOKEN='' \
+              -e MYINSTANTS_USER_AGENT='' \
+              -e MYINSTANTS_AUTHORIZATION='' \
               myinstantsbot
 ```
 
 Notes:
 
 TELEGRAM_TOKEN='' needs to be replace with your bot token.
+
+MYINSTANTS_USER_AGENT and MYINSTANTS_AUTHORIZATION are optional. They are the
+User-Agent and Authorization header values that www.myinstants.com allows
+through its Cloudflare protection; without them the search may be blocked.
 
 #### Run without Docker
 

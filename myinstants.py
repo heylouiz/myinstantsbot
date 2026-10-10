@@ -21,6 +21,11 @@ MEDIA_URL = "https://www.myinstants.com{}"
 UPLOAD_URL = "https://www.myinstants.com/en/new/"
 LOGIN_URL = "https://www.myinstants.com/accounts/login/"
 
+# Credentials agreed with the myinstants.com owner so the bot is not blocked
+# by Cloudflare. Kept in the environment so they are not published.
+BOT_USER_AGENT = os.environ.get("MYINSTANTS_USER_AGENT")
+BOT_AUTHORIZATION = os.environ.get("MYINSTANTS_AUTHORIZATION")
+
 
 class MyInstantsApiException(Exception):
     """General exception for myinstants api"""
@@ -63,8 +68,10 @@ async def search_instants(query):
 
     url = SEARCH_URL.format(query_string)
     headers = {
-        "User-Agent": generate_user_agent()
+        "User-Agent": BOT_USER_AGENT or generate_user_agent()
     }
+    if BOT_AUTHORIZATION:
+        headers["Authorization"] = BOT_AUTHORIZATION
     data = None
     async with aiohttp.ClientSession() as session:
         async with session.get(url, headers=headers) as response:
